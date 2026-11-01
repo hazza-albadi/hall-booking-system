@@ -1,17 +1,18 @@
 /**
  * إعدادات المشروع
  * ─────────────────────────────────────────────────────────────
- * 1) انسخ من Supabase ← Project Settings ← API:
- *      - Project URL         → SUPABASE_URL
- *      - anon / publishable  → SUPABASE_ANON_KEY
- *
- * المفتاح العام (anon) آمن للوضع في الواجهة: الحماية الحقيقية
- * في قاعدة البيانات (Row Level Security).
- * ⚠️ لا تضع مفتاح service_role هنا أبداً.
+ * رابط Supabase والمفتاح العام لا يُكتبان هنا ولا يُرفعان على GitHub.
+ * مصدرهما الملف المولَّد env.js:
+ *   - محلياً:  ملف .env  ثم  npm run env
+ *   - Vercel:  Settings → Environment Variables  (يُولَّد تلقائياً وقت النشر)
  */
+
+// إذا لم يُولَّد env.js بعد، نكمل بقيم فارغة فتظهر شاشة "الإعداد غير مكتمل"
+const ENV = await import('./env.js').then((m) => m.ENV).catch(() => ({}));
+
 export const CONFIG = {
-  SUPABASE_URL: 'https://YOUR-PROJECT.supabase.co',
-  SUPABASE_ANON_KEY: 'YOUR-ANON-KEY',
+  SUPABASE_URL: ENV.SUPABASE_URL ?? '',
+  SUPABASE_ANON_KEY: ENV.SUPABASE_ANON_KEY ?? '',
 
   /** إعدادات العرض في التقويم */
   CALENDAR: {

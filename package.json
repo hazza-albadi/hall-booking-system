@@ -1,0 +1,15 @@
+{
+  "name": "hall-booking-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hall booking system for committees and teams (HTML + JS + Bootstrap + Supabase)",
+  "type": "module",
+  "scripts": {
+    "env": "node scripts/build.mjs",
+    "build": "node scripts/build.mjs --dist",
+    "dev": "node scripts/build.mjs && npx --yes serve -l 5500 ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

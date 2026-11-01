@@ -6,9 +6,7 @@ import { CONFIG } from './config.js';
 
 /** هل تم ضبط الإعدادات؟ (لعرض شاشة الإعداد بدل خطأ غامض) */
 export const isConfigured =
-  /^https?:\/\//.test(CONFIG.SUPABASE_URL) &&
-  !CONFIG.SUPABASE_URL.includes('YOUR-PROJECT') &&
-  CONFIG.SUPABASE_ANON_KEY && !CONFIG.SUPABASE_ANON_KEY.includes('YOUR-');
+  /^https?:\/\//.test(CONFIG.SUPABASE_URL) && Boolean(CONFIG.SUPABASE_ANON_KEY);
 
 export const sb = isConfigured
   ? window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
