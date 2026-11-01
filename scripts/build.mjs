@@ -83,7 +83,7 @@ if (BUILD_DIST) {
   const dist = path.join(ROOT, 'dist');
   fs.rmSync(dist, { recursive: true, force: true });
   fs.mkdirSync(dist);
-  for (const item of ['index.html', 'assets', 'vendor']) {
+  for (const item of ['index.html', 'privacy.html', 'assets', 'vendor']) {
     fs.cpSync(path.join(ROOT, item), path.join(dist, item), { recursive: true });
   }
   console.log('✔ site copied to dist/');

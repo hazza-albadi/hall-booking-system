@@ -325,3 +325,12 @@ h1, h2, h3, .fw-bold { font-weight: 700; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ── 13. صفحة الخصوصية + رابطها في شاشة الدخول ─────────────── */
+.auth-privacy { display: inline-block; margin-top: 18px; font-size: .85rem; color: var(--tx3); text-decoration: none; }
+.auth-privacy:hover { color: var(--p); text-decoration: underline; }
+.legal { max-width: 820px; display: grid; gap: 20px; }
+.legal-card { padding: 28px 24px; line-height: 1.9; }
+.legal-card h2 { font-size: 1.1rem; color: var(--p); margin: 22px 0 8px; }
+.legal-card ul { padding-inline-start: 1.2rem; }
+.legal-updated { color: var(--tx3); font-size: .88rem; margin-bottom: 18px; }

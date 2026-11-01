@@ -120,7 +120,22 @@ From then on, every `git push` deploys automatically.
 If a variable is missing, the Vercel build fails with a clear message instead of publishing a broken site.
 After changing a variable in Vercel, redeploy for it to take effect.
 
-### 6) Add team leads
+### 6) Publish the Google app (so anyone you add can sign in)
+
+While the Google app is in **Testing**, only emails listed under **Audience → Test users** in Google Cloud can sign in, so every member would have to be added twice. Publishing removes that: Google lets any account through, and the site's own member list decides who gets in.
+
+1. In Google Cloud → **Google Auth Platform** → **Branding**, fill in:
+   - **Application home page:** `https://your-site.vercel.app`
+   - **Application privacy policy link:** `https://your-site.vercel.app/privacy`
+   - **Authorized domains:** `your-site.vercel.app`
+   - Leave the **logo empty**. Uploading one triggers Google's verification review.
+2. **Audience** → **Publish app** → **Confirm**.
+3. In **Clients** → your web client, add `https://your-site.vercel.app` to **Authorized JavaScript origins**.
+4. In Supabase → **Authentication** → **URL Configuration**, set **Site URL** to `https://your-site.vercel.app` and add it to **Redirect URLs** (keep `http://localhost:5500` for local testing).
+
+The app only requests name, email, and profile picture, so publishing does not require a Google review.
+
+### 7) Add team leads
 
 Sign in with your account → **الإدارة** (Admin) → **إضافة عضو** (Add member), and enter:
 
@@ -137,6 +152,7 @@ They can sign in right away.
 ```
 hall-booking/
 ├── index.html                 Single page: all screens and dialogs
+├── privacy.html               Privacy policy (Arabic + English), needed to publish the Google app
 ├── package.json               npm scripts: dev, env, build
 ├── .env.example               Template for local environment variables
 ├── vercel.json                Build settings, security headers (CSP, etc.) and caching
@@ -201,6 +217,7 @@ hall-booking/
 
 | Problem | Fix |
 |---|---|
+| Google says the app is in testing / "access blocked" | The email isn't a Google **test user**. Add it in Audience → Test users, or publish the app (step 6). |
 | "الإعداد غير مكتمل" (Setup incomplete) appears | Locally: fill in `.env`, then run `npm run env`. On Vercel: add the environment variables and redeploy. |
 | Vercel build fails with "Missing environment variables" | Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel → Settings → Environment Variables, then redeploy. |
 | After Google sign-in: "حسابك غير مسجّل" (Account not registered) | The email isn't in `members`. Add it from the admin panel or with SQL. |
