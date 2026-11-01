@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="نظام حجز القاعة للجان والفرق">
+  <meta name="theme-color" content="#2D1F42">
+  <title>حجز القاعة</title>
+  <link rel="icon" type="image/png" href="assets/img/logo-color.png">
+
+  <!-- المكتبات (محفوظة محلياً داخل vendor بدون اعتماد على الإنترنت) -->
+  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+  <!-- تنسيقات المشروع (الهوية) -->
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+  <!-- ═════════════ شاشة التحميل ═════════════ -->
+  <div id="screen-loading" class="screen screen-center">
+    <img src="assets/img/logo-color.png" alt="" class="loading-logo">
+    <div class="spinner-border text-primary mt-4" role="status">
+      <span class="visually-hidden">جارٍ التحميل…</span>
+    </div>
+  </div>
+
+  <!-- ═════════════ شاشة الإعداد (تظهر إذا لم يُضبط config.js) ═════════════ -->
+  <div id="screen-setup" class="screen screen-center screen-dark" hidden>
+    <div class="auth-card">
+      <img src="assets/img/logo-color.png" alt="الشعار" class="auth-logo">
+      <h1 class="auth-title">الإعداد غير مكتمل</h1>
+      <p class="auth-text">
+        أضف رابط مشروع Supabase والمفتاح العام في الملف
+        <code dir="ltr">assets/js/config.js</code>
+        ثم أعد تحميل الصفحة. الخطوات بالتفصيل في ملف <code>README.md</code>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ═════════════ شاشة تسجيل الدخول ═════════════ -->
+  <div id="screen-login" class="screen screen-center screen-dark" hidden>
+    <div class="auth-card">
+      <img src="assets/img/logo-color.png" alt="الشعار" class="auth-logo">
+      <h1 class="auth-title">حجز القاعة</h1>
+      <p class="auth-text">لرؤساء الفرق والإدارة العليا</p>
+      <button type="button" id="btn-google" class="btn btn-google w-100">
+        <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/>
+          <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+          <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/>
+          <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
+        </svg>
+        <span>الدخول بحساب جوجل</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═════════════ شاشة "غير مسجّل" ═════════════ -->
+  <div id="screen-denied" class="screen screen-center screen-dark" hidden>
+    <div class="auth-card">
+      <div class="auth-icon"><i class="bi bi-shield-lock"></i></div>
+      <h1 class="auth-title">حسابك غير مسجّل</h1>
+      <p class="auth-text">
+        الإيميل <strong id="denied-email" dir="ltr"></strong> غير موجود في قائمة المصرّح لهم.
+        تواصل مع الإدارة العليا لإضافتك.
+      </p>
+      <button type="button" class="btn btn-light w-100" data-action="logout">
+        <i class="bi bi-arrow-repeat"></i> الدخول بحساب آخر
+      </button>
+    </div>
+  </div>
+
+  <!-- ═════════════ التطبيق ═════════════ -->
+  <div id="screen-app" class="screen" hidden>
+
+    <!-- الشريط العلوي -->
+    <header class="app-header">
+      <div class="container-xl app-header-inner">
+        <a href="#calendar" class="brand">
+          <img src="assets/img/logo-white.png" alt="الشعار" class="brand-logo">
+          <span class="brand-divider"></span>
+          <span class="brand-name">حجز القاعة</span>
+        </a>
+
+        <nav class="app-nav" aria-label="التنقل">
+          <a href="#calendar" class="app-nav-link" data-route="calendar"><i class="bi bi-calendar3"></i><span>التقويم</span></a>
+          <a href="#mine" class="app-nav-link" data-route="mine"><i class="bi bi-bookmark-check"></i><span>حجوزاتي</span></a>
+          <a href="#admin" class="app-nav-link" data-route="admin" data-admin-only hidden><i class="bi bi-gear"></i><span>الإدارة</span></a>
+        </nav>
+
+        <div class="dropdown">
+          <button class="user-chip" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="الحساب">
+            <img id="user-avatar" class="user-avatar" alt="" referrerpolicy="no-referrer" hidden>
+            <span id="user-initial" class="user-avatar user-avatar-fallback"></span>
+            <span class="user-meta">
+              <span id="user-name" class="user-name"></span>
+              <span id="user-team" class="user-team"></span>
+            </span>
+            <i class="bi bi-chevron-down small opacity-75"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-start shadow border-0">
+            <li><span class="dropdown-item-text small text-muted" id="user-email" dir="ltr"></span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><button class="dropdown-item text-danger" type="button" data-action="logout"><i class="bi bi-box-arrow-left"></i> تسجيل الخروج</button></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <main class="container-xl app-main">
+
+      <!-- ─── التقويم ─── -->
+      <section id="view-calendar" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <h1 class="view-title">جدول القاعة</h1>
+            <p class="view-sub">اضغط على أي وقت فاضي للحجز</p>
+          </div>
+          <button type="button" class="btn btn-brand d-none d-md-inline-flex" data-action="new-booking">
+            <i class="bi bi-plus-lg"></i> حجز جديد
+          </button>
+        </div>
+        <div class="panel p-2 p-md-3">
+          <div id="calendar"></div>
+        </div>
+        <details class="legend panel mt-3">
+          <summary>ألوان الفرق</summary>
+          <div id="legend" class="legend-list"></div>
+        </details>
+      </section>
+
+      <!-- ─── حجوزاتي ─── -->
+      <section id="view-mine" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <h1 class="view-title">حجوزات فريقي</h1>
+            <p class="view-sub" id="mine-sub"></p>
+          </div>
+        </div>
+        <div class="seg mb-3" role="tablist">
+          <button type="button" class="seg-btn active" data-mine-tab="upcoming">القادمة</button>
+          <button type="button" class="seg-btn" data-mine-tab="history">السجل</button>
+        </div>
+        <div id="mine-list" class="booking-list"></div>
+      </section>
+
+      <!-- ─── الإدارة ─── -->
+      <section id="view-admin" class="view" hidden>
+        <div class="view-head">
+          <div>
+            <h1 class="view-title">الإدارة</h1>
+            <p class="view-sub">إدارة المصرّح لهم بالحجز، ومتابعة كل الحجوزات</p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-5">
+            <div class="panel p-3 p-md-4 h-100">
+              <h2 class="panel-title"><i class="bi bi-person-plus"></i> إضافة عضو</h2>
+              <form id="member-form" class="vstack gap-3" novalidate>
+                <div>
+                  <label class="form-label" for="m-email">إيميل جوجل</label>
+                  <input type="email" class="form-control" id="m-email" dir="ltr" placeholder="name@gmail.com" required autocomplete="off">
+                </div>
+                <div>
+                  <label class="form-label" for="m-name">الاسم <span class="text-muted small">(اختياري)</span></label>
+                  <input type="text" class="form-control" id="m-name" maxlength="100" autocomplete="off">
+                </div>
+                <div class="row g-2">
+                  <div class="col-7">
+                    <label class="form-label" for="m-team">الفريق</label>
+                    <select class="form-select" id="m-team" required></select>
+                  </div>
+                  <div class="col-5">
+                    <label class="form-label" for="m-role">الصلاحية</label>
+                    <select class="form-select" id="m-role">
+                      <option value="lead">رئيس فريق</option>
+                      <option value="admin">إدارة عليا</option>
+                    </select>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-brand"><i class="bi bi-plus-lg"></i> إضافة</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="panel p-3 p-md-4 h-100">
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                <h2 class="panel-title mb-0"><i class="bi bi-people"></i> الأعضاء <span id="members-count" class="badge rounded-pill text-bg-light"></span></h2>
+                <input type="search" id="members-search" class="form-control form-control-sm w-auto" placeholder="بحث…">
+              </div>
+              <div id="members-list" class="member-list"></div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="panel p-3 p-md-4">
+              <h2 class="panel-title"><i class="bi bi-calendar-week"></i> كل الحجوزات القادمة</h2>
+              <div id="admin-bookings" class="booking-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- زر الحجز العائم (للجوال) -->
+    <button type="button" class="fab d-md-none" data-action="new-booking" aria-label="حجز جديد">
+      <i class="bi bi-plus-lg"></i>
+    </button>
+  </div>
+
+
+  <!-- ═════════════ نافذة الحجز ═════════════ -->
+  <div class="modal fade sheet" id="booking-modal" tabindex="-1" aria-labelledby="booking-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content" id="booking-form" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="booking-title">حجز القاعة</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body vstack gap-3">
+
+          <div id="b-team-wrap" hidden>
+            <label class="form-label" for="b-team">باسم فريق</label>
+            <select class="form-select" id="b-team"></select>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-7">
+              <label class="form-label" for="b-date">اليوم</label>
+              <input type="date" class="form-control" id="b-date" required>
+            </div>
+            <div class="col-5">
+              <label class="form-label" for="b-start">من الساعة</label>
+              <select class="form-select" id="b-start" required></select>
+            </div>
+          </div>
+
+          <div>
+            <span class="form-label d-block">المدة</span>
+            <div class="duration-grid" id="b-durations" role="radiogroup" aria-label="المدة"></div>
+          </div>
+
+          <div>
+            <label class="form-label" for="b-title">الغرض <span class="text-muted small">(اختياري)</span></label>
+            <input type="text" class="form-control" id="b-title" maxlength="120" placeholder="مثال: بروفة، اجتماع، تجهيز…" autocomplete="off">
+          </div>
+
+          <div id="b-status" class="slot-status" aria-live="polite"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-brand w-100 btn-lg" id="b-submit">
+            <span class="btn-label"><i class="bi bi-check2-circle"></i> احجز</span>
+            <span class="spinner-border spinner-border-sm" hidden></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═════════════ نافذة تفاصيل الحجز ═════════════ -->
+  <div class="modal fade sheet" id="details-modal" tabindex="-1" aria-labelledby="details-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="details-title">تفاصيل الحجز</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+        </div>
+        <div class="modal-body" id="details-body"></div>
+        <div class="modal-footer" id="details-footer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الإشعارات -->
+  <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3" id="toasts"></div>
+
+  <!-- السكربتات: المكتبات أولاً ثم التطبيق -->
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="vendor/fullcalendar/fullcalendar.min.js"></script>
+  <script src="vendor/fullcalendar/locale-ar.min.js"></script>
+  <script src="vendor/supabase/supabase.min.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
